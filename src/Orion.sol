@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import {World} from "../lib/mud/packages/solecs/src/World.sol";
+import {Coord, PositionComponent} from "./PositionComponent.sol";
+import {Collider, SquareComponent} from "./SquareComponent.sol";
+
 enum Direction {
     NORTH,
     EAST,
@@ -8,78 +12,88 @@ enum Direction {
     WEST
 }
 
-struct Coord {
-    int256 x;
-    int256 y;
-}
-
-struct Collider {
-    int256 width;
-    Coord coord;
-}
-
-contract Orion {
+contract Orion is World {
     int256 constant PRECISION = 1 ether;
     int256 constant PLAYER_WIDTH = 0.5 ether;
 
     int256 constant MOVEMENT_SPEED = 0.25 ether;
 
-    Collider[] public colliders;
-    mapping(address => Coord) public positions;
+    uint256 colliderCount;
 
-    event NewPosition(address account, Coord position);
     event Destroy(uint256 index);
 
-    function addColliders(Collider[] memory newColliders) external {
-        for (uint256 i; i < newColliders.length; i++) {
-            colliders.push(newColliders[i]);
+    function addColliders(Collider[] calldata colliders, Coord[] memory coords)
+        external
+    {
+        PositionComponent c = PositionComponent(
+            this.getComponent(uint256(keccak256("example.component.Position")))
+        );
+        SquareComponent s = SquareComponent(
+            this.getComponent(uint256(keccak256("example.component.Square")))
+        );
+
+        for (uint256 i; i < colliders.length; i++) {
+            c.set(i, coords[i]);
+            s.set(i, colliders[i]);
+
+            colliderCount++;
         }
     }
 
     function move(Direction direction) external {
-        Coord storage position = positions[msg.sender];
+        PositionComponent c = PositionComponent(
+            this.getComponent(uint256(keccak256("example.component.Position")))
+        );
+        SquareComponent s = SquareComponent(
+            this.getComponent(uint256(keccak256("example.component.Square")))
+        );
+
+        Coord memory player = c.getValue(uint256(uint160(msg.sender)));
 
         if (direction == Direction.NORTH) {
-            position.y += MOVEMENT_SPEED;
+            player.y += MOVEMENT_SPEED;
         } else if (direction == Direction.EAST) {
-            position.x += MOVEMENT_SPEED;
+            player.x += MOVEMENT_SPEED;
         } else if (direction == Direction.SOUTH) {
-            position.y -= MOVEMENT_SPEED;
+            player.y -= MOVEMENT_SPEED;
         } else {
-            position.x -= MOVEMENT_SPEED;
+            player.x -= MOVEMENT_SPEED;
         }
 
-        for (uint256 i; i < colliders.length; i++) {
-            Collider storage collider = colliders[i];
+        for (uint256 i; i < colliderCount; i++) {
+            Collider memory collider = s.getValue(i);
 
             require(
-                position.x + PLAYER_WIDTH <=
-                    collider.coord.x - collider.width ||
-                    position.x - PLAYER_WIDTH >=
-                    collider.coord.x + collider.width ||
-                    position.y + PLAYER_WIDTH <=
-                    collider.coord.y - collider.width ||
-                    position.y - PLAYER_WIDTH >=
-                    collider.coord.y + collider.width,
+                player.x + PLAYER_WIDTH <= collider.x - collider.width ||
+                    player.x - PLAYER_WIDTH >= collider.x + collider.width ||
+                    player.y + PLAYER_WIDTH <= collider.y - collider.height ||
+                    player.y - PLAYER_WIDTH >= collider.y + collider.height,
                 "Collision with obstacle"
             );
         }
 
-        emit NewPosition(msg.sender, position);
+        c.set(uint256(uint160(msg.sender)), player);
     }
 
     function shoot(Coord calldata pointer) external {
-        Coord storage player = positions[msg.sender];
+        PositionComponent c = PositionComponent(
+            this.getComponent(uint256(keccak256("example.component.Position")))
+        );
+        SquareComponent s = SquareComponent(
+            this.getComponent(uint256(keccak256("example.component.Square")))
+        );
+
+        Coord memory player = c.getValue(uint256(uint160(msg.sender)));
 
         uint256 minIndex;
         int256 minDistance = 100000 ether;
-        for (uint256 i; i < colliders.length; i++) {
-            Collider storage collider = colliders[i];
+        for (uint256 i; i < colliderCount; i++) {
+            Collider memory collider = s.getValue(i);
 
-            int256 leftX = collider.coord.x - collider.width;
-            int256 rightX = collider.coord.x + collider.width;
-            int256 bottomY = collider.coord.y - collider.width;
-            int256 topY = collider.coord.y + collider.width;
+            int256 leftX = collider.x - collider.width;
+            int256 rightX = collider.x + collider.width;
+            int256 bottomY = collider.y - collider.width;
+            int256 topY = collider.y + collider.width;
 
             if (
                 intersects(
@@ -123,7 +137,7 @@ contract Orion {
                     bottomY
                 )
             ) {
-                int256 euclid = distance(collider.coord, player);
+                int256 euclid = distance(Coord(collider.x, collider.x), player);
                 if (euclid < minDistance) {
                     minDistance = euclid;
                     minIndex = i;
@@ -133,15 +147,10 @@ contract Orion {
 
         // This doesn't always work as the centre of a square may be closer
         if (minDistance != 100000 ether) {
-            colliders[minIndex].coord.x = 10000 ether;
-            colliders[minIndex].coord.y = 10000 ether;
+            c.set(minIndex, Coord(10000 ether, 10000 ether));
 
             emit Destroy(minIndex);
         }
-    }
-
-    function getObjects() external view returns (Collider[] memory) {
-        return colliders;
     }
 
     function distance(Coord memory a, Coord memory b)
