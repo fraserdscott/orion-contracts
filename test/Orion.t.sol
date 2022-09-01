@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import {World} from "../lib/mud/packages/solecs/src/World.sol";
+import {World} from "mud/World.sol";
 import {ID as PositionComponentID, PositionComponent, Coord} from "../src/PositionComponent.sol";
 import {Collider, SquareComponent} from "../src/SquareComponent.sol";
 import {MoveSystem, Direction} from "../src/MoveSystem.sol";
@@ -29,11 +29,12 @@ contract OrionTest is Test {
         shoot = new ShootSystem(world, address(0));
 
         position = new PositionComponent(address(world));
+        square = new SquareComponent(address(world));
+
         position.authorizeWriter(address(move)); // let it move objects
         position.authorizeWriter(address(terrain)); // let it spawn objects
         position.authorizeWriter(address(this)); // let us spawn the player
 
-        square = new SquareComponent(address(world));
         square.authorizeWriter(address(terrain)); // let it spawn objects
         square.authorizeWriter(address(shoot)); // let it shoot and destroy objects
     }

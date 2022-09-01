@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "../lib/mud/packages/solecs/src/System.sol";
-import {IWorld} from "../lib/mud/packages/solecs/src/interfaces/IWorld.sol";
-import {IUint256Component} from "../lib/mud/packages/solecs/src/interfaces/IUint256Component.sol";
-import {IComponent} from "../lib/mud/packages/solecs/src/interfaces/IComponent.sol";
-import {getAddressById} from "../lib/mud/packages/solecs/src/utils.sol";
+import "mud/System.sol";
+import {IWorld} from "mud/interfaces/IWorld.sol";
+import {getAddressById} from "mud/utils.sol";
 
 import {PositionComponent, ID as PositionComponentID, Coord} from "./PositionComponent.sol";
 import {SquareComponent, ID as SquareComponentID, Collider} from "./SquareComponent.sol";

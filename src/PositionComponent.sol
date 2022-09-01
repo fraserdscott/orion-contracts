@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {Component} from "../lib/mud/packages/solecs/src/Component.sol";
-import {LibTypes} from "../lib/mud/packages/solecs/src/Component.sol";
+import {Component} from "mud/Component.sol";
+import {LibTypes} from "mud/Component.sol";
 
 struct Coord {
     int256 x;

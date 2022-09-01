@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {Component} from "../lib/mud/packages/solecs/src/Component.sol";
-import {LibTypes} from "../lib/mud/packages/solecs/src/Component.sol";
+import {Component, LibTypes} from "mud/Component.sol";
 
 struct Collider {
     int256 x;
