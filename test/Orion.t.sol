@@ -17,8 +17,8 @@ contract OrionTest is Test {
     TerrainSystem public terrain;
     ShootSystem public shoot;
 
-    Collider[] public newColliders;
     Coord[] public newCoords;
+    Collider[] public newColliders;
 
     function setUp() public {
         world = new World();

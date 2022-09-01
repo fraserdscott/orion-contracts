@@ -2,14 +2,13 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import {ID as PositionComponentID, PositionComponent, Coord} from "../src/PositionComponent.sol";
-import {Coord, PositionComponent} from "../src/PositionComponent.sol";
-import {Collider, SquareComponent} from "../src/SquareComponent.sol";
+import {Coord} from "../src/PositionComponent.sol";
+import {Collider} from "../src/SquareComponent.sol";
 import {TerrainSystem} from "../src/TerrainSystem.sol";
 
 contract OrionScript is Script {
-    Collider[] public newColliders;
     Coord[] newCoords;
+    Collider[] public newColliders;
 
     function run() public {
         vm.startBroadcast();
