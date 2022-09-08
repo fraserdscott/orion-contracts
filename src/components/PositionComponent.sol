@@ -36,6 +36,9 @@ contract PositionComponent is Component {
         override
         returns (string[] memory keys, LibTypes.SchemaValue[] memory values)
     {
+        keys = new string[](2);
+        values = new LibTypes.SchemaValue[](2);
+
         keys[0] = "x";
         values[0] = LibTypes.SchemaValue.INT256;
 

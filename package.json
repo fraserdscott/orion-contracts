@@ -1,0 +1,28 @@
+{
+  "name": "orion-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "dist": "rimraf abi && mkdir abi && bash exports.sh",
+    "types": "rimraf types && typechain --target=ethers-v5 abi/*.json && mud system-types"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fraserdscott/orion-contracts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fraserdscott/orion-contracts/issues"
+  },
+  "homepage": "https://github.com/fraserdscott/orion-contracts#readme",
+  "dependencies": {
+    "@latticexyz/cli": "^0.8.1",
+    "@typechain/ethers-v5": "^9.0.0"
+  }
+}

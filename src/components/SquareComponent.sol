@@ -37,10 +37,19 @@ contract SquareComponent is Component {
         override
         returns (string[] memory keys, LibTypes.SchemaValue[] memory values)
     {
+        keys = new string[](4);
+        values = new LibTypes.SchemaValue[](4);
+
         keys[0] = "x";
         values[0] = LibTypes.SchemaValue.INT256;
 
         keys[1] = "y";
         values[1] = LibTypes.SchemaValue.INT256;
+
+        keys[2] = "width";
+        values[2] = LibTypes.SchemaValue.INT256;
+
+        keys[3] = "height";
+        values[3] = LibTypes.SchemaValue.INT256;
     }
 }

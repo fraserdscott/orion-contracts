@@ -7,10 +7,10 @@ import {IUint256Component} from "mud/interfaces/IUint256Component.sol";
 import {IComponent} from "mud/interfaces/IComponent.sol";
 import {getAddressById} from "mud/utils.sol";
 
-import {PositionComponent, ID as PositionComponentID, Coord} from "./PositionComponent.sol";
-import {SquareComponent, ID as SquareComponentID, Collider} from "./SquareComponent.sol";
+import {PositionComponent, ID as PositionComponentID, Coord} from "../components/PositionComponent.sol";
+import {SquareComponent, ID as SquareComponentID, Collider} from "../components/SquareComponent.sol";
 
-uint256 constant ID = uint256(keccak256("ember.system.move"));
+uint256 constant ID = uint256(keccak256("orion.system.move"));
 
 enum Direction {
     NORTH,
@@ -51,15 +51,19 @@ contract MoveSystem is System {
 
         uint256[] memory colliders = square.getEntities();
         for (uint256 i; i < colliders.length; i++) {
-            Collider memory collider = square.getValue(colliders[i]);
+            if (colliders[i] != uint256(uint160(msg.sender))) {
+                Collider memory collider = square.getValue(colliders[i]);
 
-            require(
-                player.x + PLAYER_WIDTH <= collider.x - collider.width ||
-                    player.x - PLAYER_WIDTH >= collider.x + collider.width ||
-                    player.y + PLAYER_WIDTH <= collider.y - collider.height ||
-                    player.y - PLAYER_WIDTH >= collider.y + collider.height,
-                "Collision with obstacle"
-            );
+                require(
+                    player.x + PLAYER_WIDTH <= collider.x - collider.width ||
+                        player.x - PLAYER_WIDTH >=
+                        collider.x + collider.width ||
+                        player.y + PLAYER_WIDTH <=
+                        collider.y - collider.height ||
+                        player.y - PLAYER_WIDTH >= collider.y + collider.height,
+                    "Collision with obstacle"
+                );
+            }
         }
 
         position.set(uint256(uint160(msg.sender)), player);

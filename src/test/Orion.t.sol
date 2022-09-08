@@ -3,11 +3,12 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import {World} from "mud/World.sol";
-import {ID as PositionComponentID, PositionComponent, Coord} from "../src/PositionComponent.sol";
-import {Collider, SquareComponent} from "../src/SquareComponent.sol";
-import {MoveSystem, Direction} from "../src/MoveSystem.sol";
-import {TerrainSystem} from "../src/TerrainSystem.sol";
-import {ShootSystem} from "../src/ShootSystem.sol";
+import {ID as PositionComponentID, PositionComponent, Coord} from "../components/PositionComponent.sol";
+import {Collider, SquareComponent} from "../components/SquareComponent.sol";
+import {MoveSystem, Direction} from "../systems/MoveSystem.sol";
+import {TerrainSystem} from "../systems/TerrainSystem.sol";
+import {ShootSystem} from "../systems/ShootSystem.sol";
+import {SpawnSystem} from "../systems/SpawnSystem.sol";
 
 contract OrionTest is Test {
     World public world;
@@ -16,6 +17,7 @@ contract OrionTest is Test {
     MoveSystem public move;
     TerrainSystem public terrain;
     ShootSystem public shoot;
+    SpawnSystem public spawn;
 
     Coord[] public newCoords;
     Collider[] public newColliders;
@@ -27,21 +29,23 @@ contract OrionTest is Test {
         move = new MoveSystem(world, address(0));
         terrain = new TerrainSystem(world, address(0));
         shoot = new ShootSystem(world, address(0));
+        spawn = new SpawnSystem(world, address(0));
 
         position = new PositionComponent(address(world));
         square = new SquareComponent(address(world));
 
+        position.getSchema();
         position.authorizeWriter(address(move)); // let it move objects
         position.authorizeWriter(address(terrain)); // let it spawn objects
-        position.authorizeWriter(address(this)); // let us spawn the player
+        position.authorizeWriter(address(spawn)); // let it move objects
 
-        square.authorizeWriter(address(terrain)); // let it spawn objects
         square.authorizeWriter(address(shoot)); // let it shoot and destroy objects
+        square.authorizeWriter(address(terrain)); // let it spawn objects
+        square.authorizeWriter(address(spawn)); // let it spawn objects
     }
 
-    function testStart() public {
-        // Spawn the player
-        position.set(uint256(uint160(address(this))), Coord(0, 0));
+    function testSpawn() public {
+        spawn.execute("");
 
         Coord memory c = position.getValue(uint256(uint160(address(this))));
 
@@ -50,8 +54,7 @@ contract OrionTest is Test {
     }
 
     function testMove() public {
-        // Spawn the player
-        position.set(uint256(uint160(address(this))), Coord(0, 0));
+        spawn.execute("");
 
         move.executeTyped(Direction.NORTH);
 
@@ -67,8 +70,7 @@ contract OrionTest is Test {
 
         terrain.executeTyped(newCoords, newColliders);
 
-        // Spawn the player
-        position.set(uint256(uint160(address(this))), Coord(0, 0));
+        spawn.execute("");
 
         move.executeTyped(Direction.NORTH);
         move.executeTyped(Direction.NORTH);
@@ -95,8 +97,7 @@ contract OrionTest is Test {
         assertEq(cs[0], 0);
         assertEq(cs.length, newColliders.length);
 
-        // Spawn the player
-        position.set(uint256(uint160(address(this))), Coord(0, 0));
+        spawn.execute("");
         shoot.executeTyped(Coord(1 ether, 1.1 ether));
 
         assert(!square.has(0));

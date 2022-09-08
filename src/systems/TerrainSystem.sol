@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "../lib/mud/packages/solecs/src/System.sol";
-import {IWorld} from "../lib/mud/packages/solecs/src/interfaces/IWorld.sol";
-import {IUint256Component} from "../lib/mud/packages/solecs/src/interfaces/IUint256Component.sol";
-import {IComponent} from "../lib/mud/packages/solecs/src/interfaces/IComponent.sol";
-import {getAddressById} from "../lib/mud/packages/solecs/src/utils.sol";
+import "mud/System.sol";
+import {IWorld} from "mud/interfaces/IWorld.sol";
+import {IUint256Component} from "mud/interfaces/IUint256Component.sol";
+import {IComponent} from "mud/interfaces/IComponent.sol";
+import {getAddressById} from "mud/utils.sol";
 
-import {PositionComponent, ID as PositionComponentID, Coord} from "./PositionComponent.sol";
-import {SquareComponent, ID as SquareComponentID, Collider} from "./SquareComponent.sol";
+import {PositionComponent, ID as PositionComponentID, Coord} from "../components/PositionComponent.sol";
+import {SquareComponent, ID as SquareComponentID, Collider} from "../components/SquareComponent.sol";
 
-uint256 constant ID = uint256(keccak256("ember.system.terrain"));
+uint256 constant ID = uint256(keccak256("orion.system.terrain"));
 
 contract TerrainSystem is System {
     constructor(IWorld _world, address _components)

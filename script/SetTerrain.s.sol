@@ -2,19 +2,19 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import {Coord} from "../src/PositionComponent.sol";
-import {Collider} from "../src/SquareComponent.sol";
-import {TerrainSystem} from "../src/TerrainSystem.sol";
+import {Coord} from "../src/components/PositionComponent.sol";
+import {Collider} from "../src/components/SquareComponent.sol";
+import {TerrainSystem} from "../src/systems/TerrainSystem.sol";
 
 contract OrionScript is Script {
     Coord[] newCoords;
-    Collider[] public newColliders;
+    Collider[] newColliders;
 
     function run() public {
         vm.startBroadcast();
 
         TerrainSystem terrain = TerrainSystem(
-            0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
+            0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
         );
 
         newCoords.push(Coord(1 ether, 1 ether));
